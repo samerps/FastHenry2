@@ -3,12 +3,12 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.01.0622 */
-/* at Tue Jan 19 04:14:07 2038
+ /* File created by MIDL compiler version 8.01.0628 */
+/* at Tue Jan 19 03:14:07 2038
  */
 /* Compiler settings for FastHenry2.odl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0622 
-    protocol : dce , ms_ext, c_ext, robust
+    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
+    protocol : all , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
@@ -16,12 +16,11 @@
 */
 /* @@MIDL_FILE_HEADING(  ) */
 
-#pragma warning( disable: 4049 )  /* more than 64k source lines */
 
 
 /* verify that the <rpcndr.h> version is high enough to compile this file*/
 #ifndef __REQUIRED_RPCNDR_H_VERSION__
-#define __REQUIRED_RPCNDR_H_VERSION__ 475
+#define __REQUIRED_RPCNDR_H_VERSION__ 500
 #endif
 
 #include "rpc.h"
@@ -37,6 +36,14 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
+
+#ifndef DECLSPEC_XFGVIRT
+#if defined(_CONTROL_FLOW_GUARD_XFG)
+#define DECLSPEC_XFGVIRT(base, func) __declspec(xfg_virtual(base, func))
+#else
+#define DECLSPEC_XFGVIRT(base, func)
+#endif
 #endif
 
 /* Forward Declarations */ 
@@ -97,28 +104,34 @@ DEFINE_GUID(DIID_IFastHenry,0x3BAD3C03,0x3868,0x4C3C,0xB2,0x65,0xBD,0xAE,0x2A,0x
     {
         BEGIN_INTERFACE
         
+        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IFastHenry * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
             _COM_Outptr_  void **ppvObject);
         
+        DECLSPEC_XFGVIRT(IUnknown, AddRef)
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IFastHenry * This);
         
+        DECLSPEC_XFGVIRT(IUnknown, Release)
         ULONG ( STDMETHODCALLTYPE *Release )( 
             IFastHenry * This);
         
+        DECLSPEC_XFGVIRT(IDispatch, GetTypeInfoCount)
         HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
             IFastHenry * This,
             /* [out] */ UINT *pctinfo);
         
+        DECLSPEC_XFGVIRT(IDispatch, GetTypeInfo)
         HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
             IFastHenry * This,
             /* [in] */ UINT iTInfo,
             /* [in] */ LCID lcid,
             /* [out] */ ITypeInfo **ppTInfo);
         
+        DECLSPEC_XFGVIRT(IDispatch, GetIDsOfNames)
         HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
             IFastHenry * This,
             /* [in] */ REFIID riid,
@@ -127,6 +140,7 @@ DEFINE_GUID(DIID_IFastHenry,0x3BAD3C03,0x3868,0x4C3C,0xB2,0x65,0xBD,0xAE,0x2A,0x
             /* [in] */ LCID lcid,
             /* [size_is][out] */ DISPID *rgDispId);
         
+        DECLSPEC_XFGVIRT(IDispatch, Invoke)
         /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
             IFastHenry * This,
             /* [annotation][in] */ 

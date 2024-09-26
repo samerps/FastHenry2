@@ -5,12 +5,12 @@
 /* link this file in with the server and any clients */
 
 
- /* File created by MIDL compiler version 8.01.0622 */
-/* at Tue Jan 19 04:14:07 2038
+ /* File created by MIDL compiler version 8.01.0628 */
+/* at Tue Jan 19 03:14:07 2038
  */
 /* Compiler settings for FastHenry2.odl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0622 
-    protocol : dce , ms_ext, c_ext, robust
+    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
+    protocol : all , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
@@ -18,7 +18,6 @@
 */
 /* @@MIDL_FILE_HEADING(  ) */
 
-#pragma warning( disable: 4049 )  /* more than 64k source lines */
 
 
 #ifdef __cplusplus
