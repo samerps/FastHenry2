@@ -32,14 +32,29 @@ void give_cell_adjaceny(Gcell *leaf, char leafdir, Gcell *nonleaf, char nonleafd
 void combine_nodes(Gcell *leafcell, char leafdir, G_nodes *fareast_north, G_nodes *farwest_south);
 void replace_node(G_nodes *old_node, G_nodes *new_node);
 void kill_node(G_nodes *node);
+void delete_first_node(Nonuni_gp *gp);
 int readTree(FILE *fp, Nonuni_gp *gp);
+void fprint_node_list(G_nodes *node, FILE *fp);
+void dump_node(G_nodes *node, FILE *fp);
 void dump_leaf_cells_to_file(Gcell *cell, char *fname);
 void dump_leaf_cells(Gcell *cell, FILE *fp);
 void delete_dead_nodes(Nonuni_gp *gp);
 void remove_and_free(G_nodes *node);
+void free_g_node(G_nodes *node);
 void determine_adjaceny(G_nodes *nodelist);
 void compute_z_fils(Nonuni_gp *gp);
 void generate_segs(Nonuni_gp *gp, SYS *indsys);
+void get_width_and_shift(char width_dir, G_nodes *node, Gcell *leftcell, Gcell *rightcell, double *ret_width, double *ret_shift);
+void get_x_cell_vals(Gcell *left, G_nodes *node, Gcell *right, double *x_left, double *x_right);
+void get_y_cell_vals(Gcell *left, G_nodes *node, Gcell *right, double *y_min, double *y_max);
+void make_segs(char direction, G_nodes *node, G_nodes *othernode, double width, double x_shift, double y_shift, Nonuni_gp *gp, SYS *indsys);
+void draw_one_seg(char direction, double x1, double y1, double z1, double x2, double y2, double z2, double width, double height, double hx, double hy, double hz, double wx, double wy, double wz, int nhinc, Nonuni_gp *gp);
+void print_cell_and_kids(Gcell *cell);
+void fprint_cell_and_kids(Gcell *cell, FILE *fp);
+void fprint_bi_kids(Bi *two_kids, FILE *fp);
+void dump_cell(Gcell *cell, FILE *fp);
+void print_bi_addresses(Bi *two_kids, FILE *fp);
+void print_node_list(G_nodes *node);
 void debug_func();
 void dump_grid_leaf_cells(Grid_2d *grid, FILE *fp);
 void print_leaf_cell(Gcell *cell, FILE *fp);
@@ -946,8 +961,7 @@ void kill_node( G_nodes *node)
 }
 
 /* delete first node in nodelist if it is marked as dead. NOT USED */
-delete_first_node(gp)
-     Nonuni_gp *gp;
+void delete_first_node(Nonuni_gp *gp)
 {
   G_nodes *node;
 
@@ -998,8 +1012,7 @@ void remove_and_free(G_nodes *node)
   free_g_node(node);
 }
 
-free_g_node(node)
-     G_nodes *node;
+void free_g_node(G_nodes *node)
 {
   free(node);
 }
@@ -1155,8 +1168,8 @@ void generate_segs(Nonuni_gp *gp, SYS *indsys)
 {
   G_nodes *node, *othernode;
   double thickness, leftwidth, rightwidth;
-  static complain = 0;
-  static complain2 = 0;
+  static int complain = 0;
+  static int complain2 = 0;
   double x_shift, x_width, y_shift, y_width;
   
   gp->num_seg_groups = 0; 
@@ -1204,12 +1217,7 @@ void generate_segs(Nonuni_gp *gp, SYS *indsys)
 
 /* figure out width of segment and where its center point will be
    (center point is given as a shift from node point) */
-get_width_and_shift(width_dir, node, leftcell, rightcell, ret_width, 
-		     ret_shift)
-     char width_dir;
-     G_nodes *node;
-     Gcell *leftcell, *rightcell;
-     double *ret_width, *ret_shift;
+void get_width_and_shift(char width_dir, G_nodes *node, Gcell *leftcell, Gcell *rightcell, double *ret_width, double *ret_shift)
 {
   double x_min, x_max;  /* put the two cells in a box and these are the
 			      extremal values of the enclosing box*/
@@ -1238,10 +1246,7 @@ get_width_and_shift(width_dir, node, leftcell, rightcell, ret_width,
   *ret_shift = center - node_x; 
 }  
 
-get_x_cell_vals(left, node, right, x_left, x_right)
-     Gcell *left, *right;
-     G_nodes *node;
-     double *x_left, *x_right;
+void get_x_cell_vals(Gcell *left, G_nodes *node, Gcell *right, double *x_left, double *x_right)
 {
   if (left != NULL && !is_hole(left))
     *x_left = get_x0(left);
@@ -1263,10 +1268,7 @@ get_x_cell_vals(left, node, right, x_left, x_right)
 }
 
 /* left and right of direction */
-get_y_cell_vals(left, node, right, y_min, y_max)
-     Gcell *left, *right;
-     G_nodes *node;
-     double *y_min, *y_max;
+void get_y_cell_vals(Gcell *left, G_nodes *node, Gcell *right, double * y_min, double *y_max)
 {
   if (left != NULL && !is_hole(left))
     *y_min = get_y0(left);
@@ -1287,12 +1289,7 @@ get_y_cell_vals(left, node, right, y_min, y_max)
   
 }
 
-make_segs(direction, node, othernode, width, x_shift, y_shift, gp, indsys)
-     char direction;
-     G_nodes *node, *othernode;
-     double width, x_shift, y_shift;
-     Nonuni_gp *gp;
-     SYS *indsys;
+void make_segs(char direction, G_nodes *node, G_nodes *othernode, double width, double x_shift, double y_shift, Nonuni_gp *gp, SYS *indsys)
 {
   int num_z_pts = gp->num_z_pts;
   double *z_c = gp->z_c;
@@ -1384,14 +1381,9 @@ SEGMENT *make_one_seg(x0,y0,z0,x1,y1,z1, width, height, wx, wy, wz, gp, indsys,
 
 }
 
-draw_one_seg(direction,
-	     x1, y1, z1, x2, y2, z2, width, height, hx, hy, hz, wx, wy, wz,
-	     nhinc, gp)
-     char direction;
-     double x1, y1, z1, x2, y2, z2, width, height;
-     double hx, hy, hz, wx, wy, wz;
-     int nhinc;
-     Nonuni_gp *gp;
+void draw_one_seg(char direction,
+	     double x1, double y1, double z1, double x2, double y2, double z2, double width, double height, double hx, double hy, double hz, double wx, double wy, double wz,
+	     int nhinc, Nonuni_gp *gp)
 {
 
   FILE *fp = stdout;
@@ -1542,14 +1534,12 @@ draw_one_seg(direction,
     fprintf(fp,"\n");
 }     
 
-print_cell_and_kids(cell)
+void print_cell_and_kids(Gcell *cell)
 {
   fprint_cell_and_kids(cell, stdout);
 }
 
-fprint_cell_and_kids(cell, fp)
-     Gcell *cell;
-     FILE *fp;
+void fprint_cell_and_kids( Gcell *cell, FILE *fp)
 {
   dump_cell(cell, fp);
   
@@ -1568,17 +1558,13 @@ fprint_cell_and_kids(cell, fp)
   }
 }
 
-fprint_bi_kids(two_kids, fp)
-     Bi *two_kids;
-     FILE *fp;
+void fprint_bi_kids(Bi *two_kids, FILE * fp)
 {
   fprint_cell_and_kids(two_kids->child1, fp);
   fprint_cell_and_kids(two_kids->child2, fp);
 }
 
-dump_cell(cell, fp)
-     Gcell *cell;
-     FILE *fp;
+void dump_cell(Gcell *cell, FILE *fp)
 {
   int i;
 
@@ -1614,21 +1600,17 @@ dump_cell(cell, fp)
   fflush(fp);
 }
 
-print_bi_addresses(two_kids, fp)
-     Bi *two_kids;
-     FILE *fp;
+void print_bi_addresses(Bi *two_kids, FILE *fp)
 {
   fprintf(fp, "%d %d\n",two_kids->child1->index, two_kids->child2->index);
 }
 
-print_node_list(node)
+void print_node_list(G_nodes *node)
 {
   fprint_node_list(node, stdout);
 }
 
-fprint_node_list(node, fp)
-     G_nodes *node;
-     FILE *fp;
+void fprint_node_list(G_nodes *node, FILE * fp)
 {
   while(node != NULL) {
     dump_node(node, fp);
@@ -1636,9 +1618,7 @@ fprint_node_list(node, fp)
   }
 }
 
-dump_node(node,fp)
-     FILE *fp;
-     G_nodes *node;
+void dump_node(G_nodes *node, FILE *fp)
 {
   int i;
 
