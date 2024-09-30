@@ -4,11 +4,17 @@
 #include <stdio.h>
 #include "gp.h"
 #include "induct.h"
+#include <string.h>
 
 #define GP_DEBUG FALSE
 
   
 #define MAXLINE 1000
+
+//S Aldhaher
+// decalare functions 
+void set_gp_coord_system(grndp, gp);
+
 
 process_plane(grndp, fp, indsys)
      GROUNDPLANE *grndp;
@@ -103,7 +109,7 @@ process_plane(grndp, fp, indsys)
    the edges and z in the thickness.  Let's set up a relative coord
    to global */
 
-set_gp_coord_system(grndp, gp)
+void set_gp_coord_system(grndp, gp)
      GROUNDPLANE *grndp;
      Nonuni_gp *gp;
 {
@@ -331,7 +337,7 @@ Nonuni_gp *gp;
 }
 
 /* set coordinates of this cell and its children */
-set_cell_coords(cell,x0,y0,x1,y1)
+int set_cell_coords(cell,x0,y0,x1,y1)
      Gcell *cell;
      double x0, y0, x1, y1;
 {
@@ -1708,7 +1714,7 @@ dump_leaf_cells(cell, fp)
   }
 }
 
-dump_grid_leaf_cells( grid, fp )
+void dump_grid_leaf_cells( grid, fp )
      Grid_2d *grid;
      FILE *fp;
 {
@@ -1719,7 +1725,7 @@ dump_grid_leaf_cells( grid, fp )
       dump_leaf_cells(grid->kids[i][j], fp);
 }
 
-print_leaf_cell(cell, fp)
+void print_leaf_cell(cell, fp)
      Gcell *cell;
      FILE *fp;
 {
@@ -1728,7 +1734,7 @@ print_leaf_cell(cell, fp)
 	  cell->x1, cell->y1, 0.0, cell->x0, cell->y1, 0.0);
 }
 
-dump_nonuni_plane_currents(gp, Ib, fp)
+void dump_nonuni_plane_currents(gp, Ib, fp)
      Nonuni_gp *gp;
      CX *Ib;
      FILE *fp;
