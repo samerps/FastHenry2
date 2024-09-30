@@ -20,6 +20,7 @@
 
 #define MAXNAME 20
 
+
 /* this turns the info in line into a ContactList element */
 ContactList *make_contactlist(head, line, units, relx, rely, relz, skip)
      ContactList *head;
@@ -128,9 +129,7 @@ ContactList *make_contactlist(head, line, units, relx, rely, relz, skip)
 }
 
 
-contact_error(errstr, line, contactp)
-char *errstr, *line;
-ContactList *contactp;
+void contact_error(char *errstr, char *line, ContactList *contactp)
 {
   fprintf(stderr, "While reading in a %s contact:\n",contactp->func);
   fprintf(stderr, "%s\n%s",errstr,line);
@@ -139,9 +138,8 @@ ContactList *contactp;
   exit(1);
 }
 
-contact_error2(errstr, line, nametype)
-char *errstr, *line;
-char *nametype;
+void contact_error2(char *errstr, char * line, char *nametype)
+
 {
   fprintf(stderr, "While reading in a %s contact:\n",nametype);
   fprintf(stderr, "%s\n%s",errstr,line);
@@ -174,9 +172,8 @@ regurg_contact(fp, contactp)
 }
 
 /* This calls the functions which make the discretization around the contacts*/
-make_contacts(contactp, gp)
-Nonuni_gp *gp;
-ContactList *contactp;
+void make_contacts(ContactList *contactp, Nonuni_gp *gp)
+
 {
   double relx = contactp->relx;
   double rely = contactp->rely;
@@ -205,10 +202,7 @@ ContactList *contactp;
 
 /* cut up cell for this point until it's contained in a cell no
    bigger than the 4th argument */
-contact_point(contactp, gp, relx, rely, relz, units)
-     Nonuni_gp *gp;
-     ContactList *contactp;
-     double relx,rely,relz,units;
+void contact_point(ContactList *contactp, Nonuni_gp *gp, double relx, double rely, double relz, double units)
 {
   double *vals = contactp->vals;
   int i1,j1;

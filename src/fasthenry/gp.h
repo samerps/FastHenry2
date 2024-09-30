@@ -271,6 +271,7 @@ Gcell *pick_cell_based_on_vec();
 #define get_bi_type(two) (two->type)
 #define is_hole(cell) (cell->ishole == TRUE)
 
+void debug_func();
 #define GP_PANIC(str) { fprintf(stderr,"Internal error in nonuniform plane code: %s\n",str); debug_func(); exit(1); }
 
 #define DUMP_INDEX(ptr) {if ((ptr) == NULL) \
