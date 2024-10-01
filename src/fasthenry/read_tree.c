@@ -12,7 +12,7 @@
 #define MAXLINE 1000
 
 //S Aldhaher
-// decalare functions 
+// declare functions 
 void set_gp_coord_system(GROUNDPLANE *grndp, Nonuni_gp *gp);
 void get_nonuni_coords(double x, double y, double z, Nonuni_gp *gp, double *xr, double *yr, double *zr);
 void get_global_coords(double x, double y, double z, Nonuni_gp *gp, double *xg, double *yg, double *zg);
@@ -33,7 +33,6 @@ void combine_nodes(Gcell *leafcell, char leafdir, G_nodes *fareast_north, G_node
 void replace_node(G_nodes *old_node, G_nodes *new_node);
 void kill_node(G_nodes *node);
 void delete_first_node(Nonuni_gp *gp);
-int readTree(FILE *fp, Nonuni_gp *gp);
 void fprint_node_list(G_nodes *node, FILE *fp);
 void dump_node(G_nodes *node, FILE *fp);
 void dump_leaf_cells_to_file(Gcell *cell, char *fname);
