@@ -912,7 +912,7 @@ register  int  Col;
  */
 
 static
-EnlargeMatrix( Matrix, NewSize )
+void EnlargeMatrix( Matrix, NewSize )
 
 MatrixPtr Matrix;
 register int  NewSize;

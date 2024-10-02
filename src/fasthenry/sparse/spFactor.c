@@ -71,7 +71,7 @@ static char RCSid[] =
 
 
 // Enrico, prototypes
-static FactorComplexMatrix();
+static int FactorComplexMatrix();
 static CreateInternalVectors();
 static CountMarkowitz();
 static MarkowitzProducts();
