@@ -14,7 +14,7 @@ extern double atanh();
 
 static int notblankline();
 
-FILE *fp, *fp2, *fp3, *fptemp, *fb, *fROM;
+FILE *fp, *fp2, *fp3, *fp4, *fptemp, *fb, *fROM;
 int num_exact_mutual;
 int num_fourfil;
 int num_mutualfil;
@@ -228,10 +228,21 @@ char *argv[];
        && !(opts->orderROM > 0 && opts->onlyROM)   ) {
     concat4(outfname,"Zc",opts->suffix,".mat");   /* put filnames together */
     fp3 = fopen(outfname, "w");
+
+    //Sam A SEP 2024, dump to CSV
+    concat4(outfname,"Zc",opts->suffix,".csv");   /* put filnames together */
+    fp4 = fopen(outfname, "w");
+
     if (fp3 == NULL) {
       printf("couldn't open file %s\n",outfname);
       exit(1);
     }
+
+    if (fp4 == NULL) {
+      printf("couldn't open file %s\n",outfname);
+      exit(1);
+    }
+    
 
     for(ext = indsys->externals; ext != NULL; ext=ext->next) {
       /* printf("Row %d :  %s  to  %s\n",ext->Yindex,ext->source->node[0]->name,
@@ -578,29 +589,29 @@ char *argv[];
       formMZMt(indsys);      /*form transpose(M)*(R+jL)*M  (no w) */
 
       if (opts->dumpMats & MZMt) {
-	if (m == 0) {
-	  if (opts->kind & MATLAB) {
-            concat4(outfname,"MZMt",opts->suffix,".mat");
-	    if ( (fp2 = fopen(outfname,"w")) == NULL) {
-	      printf("Couldn't open file\n");
-	      exit(1);
-	    }
-	    printf("Saving MZMt...\n");
-	    savecmplx2(fp2,"MZMt",indsys->MtZM, indsys->num_mesh,indsys->num_mesh);
-	    fclose(fp2);
-	  }
-	  if (opts->kind & TEXT) {
-            concat4(outfname,"MZMt",opts->suffix,".dat");
-	    if ( (fp2 = fopen(outfname,"w")) == NULL) {
-	      printf("Couldn't open file\n");
-	      exit(1);
-	    }
-	    cx_dumpMat_totextfile(fp2, indsys->MtZM,
-				  indsys->num_mesh,indsys->num_mesh );
-	    fclose(fp2);
-	  }
-	}
-      }
+        if (m == 0) {
+          if (opts->kind & MATLAB) {
+                  concat4(outfname,"MZMt",opts->suffix,".mat");
+            if ( (fp2 = fopen(outfname,"w")) == NULL) {
+              printf("Couldn't open file\n");
+              exit(1);
+            }
+            printf("Saving MZMt...\n");
+            savecmplx2(fp2,"MZMt",indsys->MtZM, indsys->num_mesh,indsys->num_mesh);
+            fclose(fp2);
+          }
+          if (opts->kind & TEXT) {
+                  concat4(outfname,"MZMt",opts->suffix,".dat");
+            if ( (fp2 = fopen(outfname,"w")) == NULL) {
+              printf("Couldn't open file\n");
+              exit(1);
+            }
+            cx_dumpMat_totextfile(fp2, indsys->MtZM,
+                indsys->num_mesh,indsys->num_mesh );
+            fclose(fp2);
+          }
+        }
+            }
 
       printf("putting in frequency \n");
 
@@ -796,12 +807,31 @@ char *argv[];
 
     cx_dumpMat_totextfile(fp3, indsys->FinalY, num_extern, num_sub_extern);
     fflush(fp3);
+
+    //Sam A OCT 2024, dump to CSV
+    cx_dumpCSV_totextfile(fp4, indsys->FinalY, num_extern, num_sub_extern, freq);
+    fflush(fp4);
+    
   }
+
+  //Sam A OCT 2024, dump to CSV
+  // concat4(outfname,"Zc",opts->suffix,".csv");   /* put filnames together */
+  // fp4 = fopen(outfname, "w");
+  // fprintf(fp4, "Impedance matrix for frequency = %lg %d x %d\n ", freq, num_extern, num_extern);
+  // cx_dumpMat_totextfile(fp4, indsys->FinalY, num_extern, num_sub_extern);
+  // fflush(fp4);
+  // fclose(fp4);
+
+  //
 
   if (indsys->opts->debug == ON)
     fclose(fp);
 
   fclose(fp3);
+
+  //SAM A OCT  2024
+  fclose(fp4);
+
   if (opts->dumpMats != OFF)
     fclose(fb);
 
@@ -1491,6 +1521,8 @@ SYS *indsys;
   }
 }
 
+//FUNCTION DEFINITIONS
+
 savecmplx(fp, name, Z, rows, cols)
 FILE *fp;
 char *name;
@@ -1826,6 +1858,24 @@ int rows, cols;
   int i, j;
 
   for(i = 0; i < rows; i++) {
+    for(j = 0; j < cols; j++)
+      fprintf(fp, "%13.6lg %+13.6lgj ", Z[i][j].real, Z[i][j].imag);
+    fprintf(fp, "\n");
+  }
+  return;
+}
+
+//Sam A OCT 2024
+cx_dumpCSV_totextfile(fp, Z, rows, cols, freq)
+FILE *fp;
+CX **Z;
+int rows, cols;
+double freq;
+{
+  int i, j;
+
+  for(i = 0; i < rows; i++) {
+    fprintf(fp, "%.2f ", freq);
     for(j = 0; j < cols; j++)
       fprintf(fp, "%13.6lg %+13.6lgj ", Z[i][j].real, Z[i][j].imag);
     fprintf(fp, "\n");
