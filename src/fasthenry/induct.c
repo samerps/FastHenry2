@@ -583,43 +583,55 @@ char *argv[];
 
     starttimer;
 
-    if (!dont_form_Z
-        && (opts->mat_vect_prod == DIRECT || opts->soln_technique==LUDECOMP)) {
-      printf("multiplying M*(R + jL)*transpose(M)\n");
-      formMZMt(indsys);      /*form transpose(M)*(R+jL)*M  (no w) */
+    if (!dont_form_Z && (opts->mat_vect_prod == DIRECT || opts->soln_technique == LUDECOMP)) {
+    
+    // Inform the user about the matrix operation
+    printf("Multiplying M*(R + jL)*transpose(M)\n");
+    
+    // Form transpose(M)*(R+jL)*M (no frequency term yet)
+    formMZMt(indsys);
 
-      if (opts->dumpMats & MZMt) {
+    // Check if matrices should be dumped
+    if (opts->dumpMats & MZMt) {
+        // Check if this is the first matrix (m == 0)
         if (m == 0) {
-          if (opts->kind & MATLAB) {
-                  concat4(outfname,"MZMt",opts->suffix,".mat");
-            if ( (fp2 = fopen(outfname,"w")) == NULL) {
-              printf("Couldn't open file\n");
-              exit(1);
+            
+            // Save matrix in MATLAB format if required
+            if (opts->kind & MATLAB) {
+                concat4(outfname, "MZMt", opts->suffix, ".mat");
+                if ((fp2 = fopen(outfname, "w")) == NULL) {
+                    printf("Couldn't open file\n");
+                    exit(1);
+                }
+                printf("Saving MZMt...\n");
+                savecmplx2(fp2, "MZMt", indsys->MtZM, indsys->num_mesh, indsys->num_mesh);
+                fclose(fp2);
             }
-            printf("Saving MZMt...\n");
-            savecmplx2(fp2,"MZMt",indsys->MtZM, indsys->num_mesh,indsys->num_mesh);
-            fclose(fp2);
-          }
-          if (opts->kind & TEXT) {
-                  concat4(outfname,"MZMt",opts->suffix,".dat");
-            if ( (fp2 = fopen(outfname,"w")) == NULL) {
-              printf("Couldn't open file\n");
-              exit(1);
+
+            // Save matrix in TEXT format if required
+            if (opts->kind & TEXT) {
+                concat4(outfname, "MZMt", opts->suffix, ".dat");
+                if ((fp2 = fopen(outfname, "w")) == NULL) {
+                    printf("Couldn't open file\n");
+                    exit(1);
+                }
+                cx_dumpMat_totextfile(fp2, indsys->MtZM, indsys->num_mesh, indsys->num_mesh);
+                fclose(fp2);
             }
-            cx_dumpMat_totextfile(fp2, indsys->MtZM,
-                indsys->num_mesh,indsys->num_mesh );
-            fclose(fp2);
-          }
         }
-            }
-
-      printf("putting in frequency \n");
-
-      /* put in frequency */
-      for(i = 0; i < num_mesh; i++)
-	for(j = 0; j < num_mesh; j++)
-	  MtZM[i][j].imag *= 2*PI*freq;
     }
+
+    // Notify the user about frequency adjustment
+    printf("Putting in frequency \n");
+
+    // Apply the frequency term to the imaginary part of the matrix
+    for (i = 0; i < num_mesh; i++) {
+        for (j = 0; j < num_mesh; j++) {
+            MtZM[i][j].imag *= 2 * PI * freq;
+        }
+    }
+}
+
 
     stoptimer;
     ftimes[2] += dtime;
